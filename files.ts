@@ -1,0 +1,53 @@
+export function downloadFileByUrl(url: string, filename: string): void {
+	const link = document.createElement("a")
+	link.href = url
+	link.download = filename
+	link.click()
+	link.remove()
+}
+
+export async function pickFile(
+	accept: string | null,
+	multiple: boolean = false,
+	capture?: string
+): Promise<FileList | null> {
+	return new Promise<FileList | null>((ok) => {
+		const input = document.createElement('input')
+		input.type = 'file'
+		if (accept != null) input.accept = accept
+		if (capture != null) input.capture = capture
+
+		input.multiple = multiple
+		input.click()
+
+		input.onchange = () => {
+			ok(input.files)
+			input.remove()
+		}
+		input.oncancel = () =>{
+			ok(null)
+			input.remove()
+		}
+	})
+}
+
+export function downloadFile(blob: Blob, filename: string): void {
+	const url = URL.createObjectURL(blob)
+	downloadFileByUrl(url, filename)
+	URL.revokeObjectURL(url)
+}
+
+export function readFileAsText(blob: Blob, encoding?: string): Promise<string> {
+	return new Promise((ok) => {
+		const reader = new FileReader()
+		reader.readAsText(blob, encoding)
+		reader.onload = (ev) => {
+			const t = ev.target
+			if (!t) return ok('');
+
+			ok(t.result as string)
+		}
+		reader.onerror = () => ok('')
+		reader.onabort = () => ok('')
+	})
+}
