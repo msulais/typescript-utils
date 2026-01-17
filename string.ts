@@ -123,3 +123,77 @@ export function advancedStringSearch(
 
 	return j === searchLen
 }
+
+/**
+ * Smartly truncates text in the middle without using semicolons.
+ *
+ * @param text - The text to truncate
+ * @param limit - The max length of the result
+ * @param separator - The string to insert in the middle (default: "...")
+ */
+export const smartTruncate = (
+	text: string,
+	limit: number,
+	separator: string = '...'
+): string => {
+	if (text.length <= limit) {
+		return text
+	}
+
+	const truncateChar = () => {
+		const show = limit - separator.length
+		if (show <= 0) return separator.substring(0, limit)
+
+		const mid = Math.ceil(show / 2)
+		const end = Math.floor(show / 2)
+
+		return (
+			text.substring(0, mid) +
+			separator +
+			text.substring(text.length - end)
+		)
+	}
+	const words = text.split(/ +/)
+	if (words.length === 1) {
+		return truncateChar()
+	}
+
+	let left: string[] = []
+	let right: string[] = []
+	let lIndex = 0
+	let rIndex = words.length - 1
+	let currentLen = separator.length
+	let turn = 0 // 0 = left side, 1 = right side
+
+	while (lIndex <= rIndex) {
+		const word = turn === 0 ? words[lIndex] : words[rIndex]
+
+		// Check if adding this word + a space exceeds the limit
+		const space = (turn === 0 ? left.length : right.length) > 0 ? 1 : 0
+
+		if (currentLen + word.length + space > limit) {
+			break
+		}
+
+		currentLen += word.length + space
+		if (turn === 0) {
+			left.push(word)
+			lIndex++
+			turn = 1
+		}
+		else {
+			right.unshift(word)
+			rIndex--
+			turn = 0
+		}
+	}
+
+	// If we couldn't fit even one word on each side, fall back to char split
+	if (left.length === 0 && right.length === 0) {
+		return truncateChar()
+	}
+
+	const leftStr = left.join(' ')
+	const rightStr = right.join(' ')
+	return leftStr + separator + rightStr
+}
