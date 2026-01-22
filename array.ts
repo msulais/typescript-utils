@@ -1,3 +1,27 @@
+export function analyzeArrayIntersect<T>(original: T[], target: T[]) {
+	const added: T[] = []
+	const removed: T[] = []
+	const set_original = new Set(original)
+	const set_target = new Set(target)
+	for (const item of target) {
+		if (set_original.has(item)) {
+			continue
+		} 
+
+		added.push(item)
+	}
+
+	for (const item of original) {
+		if (set_target.has(item)) {
+			continue
+		}
+
+		removed.push(item)
+	}
+
+	return { added, removed }
+}
+
 export function binarySearch(array: number[], target: number): number | null {
 	let left = 0
 	let right = array.length - 1
