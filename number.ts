@@ -41,34 +41,10 @@ export function formatNumber(num: number, separator: {
  * @returns
  */
 export function numberToRealDigits(input: number): string {
-	const regex = /([+-]?)(\d+)(\.\d+)?[Ee]([+\-])?(\d+)/
-	const str: string = input.toString()
-
-	const result = str.match(regex)
-	if (!result) return str
-
-	const sign = result[1]
-	const num = result[2]
-	const decimal = result[3] ?? '.0'
-	const expSign = result[4]
-	const exponent = Number.parseInt(result[5])
-
-	if (expSign === '-') return (sign
-		+ '0.'
-		+ '0'.repeat(exponent - 1)
-		+ num
-		+ decimal.substring(1)
-	)
-
-	const leftover = exponent - (decimal.length - 1)
-	return (sign
-		+ num
-		+ decimal.substring(1, exponent + 1)
-		+ (leftover <= 0
-			? '.' + decimal.substring(exponent + 1)
-			: '0'.repeat(leftover)
-		)
-	)
+    return input.toLocaleString('fullwide', { 
+        useGrouping: false, 
+        maximumFractionDigits: 20, 
+    })
 }
 
 export function binaryToFloat(input: string, bit: 32 | 64 = 64): number {
