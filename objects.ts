@@ -75,10 +75,13 @@ export function match<T, U>(
 	...args: [value: T, callback: (() => U) | U][]
 ): U | void {
 	for (const arg of args) {
-		if (arg[0] === source) {
-			return typeof arg[1] === 'function'
-				? (arg[1] as () => U)()
-				: arg[1] as U
+		if (arg[0] !== source) {
+			continue
 		}
+
+		return (typeof arg[1] === 'function'
+			? (arg[1] as () => U)()
+			: arg[1] as U
+		)
 	}
 }
