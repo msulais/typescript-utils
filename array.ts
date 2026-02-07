@@ -89,7 +89,7 @@ export function moveArrayElement<T>(
  * ### Examples
  * ```ts
  * compressArraySequences([1, 2, 3, 4, 5]) // Returns ["1+4"] (Saved space)
- * compressArraySequences([6, 7])          // Returns [6, 7] (Token "6+1" is longer than "6,7")
+ * compressArraySequences([6, 7])          // Returns [6, 7] (Token "6+1" (including quote) is longer than "6,7")
  * compressArraySequences([10, 9, 8, "A"]) // Returns ["10-2", "A"] (Handles descending & mixed types)
  * ```
  */
