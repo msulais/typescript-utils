@@ -6,7 +6,7 @@ export function analyzeArrayIntersect<T>(original: T[], target: T[]) {
 	for (const item of target) {
 		if (set_original.has(item)) {
 			continue
-		} 
+		}
 
 		added.push(item)
 	}
@@ -34,10 +34,6 @@ export function binarySearch(array: number[], target: number): number | null {
 	}
 
 	return null
-}
-
-export function isArrayEqual<T, U>(arr: T[], target: U[]): boolean {
-	return arr.toString() === target.toString()
 }
 
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -97,9 +93,10 @@ export function compressArraySequences<T>(input: T[]): T[] {
 	const output: T[] = []
 	let buffer: number[] = []
 	let direction = 0
-
-	const flushBuffer = () => {
-		if (buffer.length === 0) return
+	const fn_flushBuffer = () => {
+		if (buffer.length === 0) {
+			return
+		}
 
 		if (buffer.length === 1) {
 			output.push(buffer[0] as T)
@@ -112,14 +109,13 @@ export function compressArraySequences<T>(input: T[]): T[] {
 		const end = buffer[buffer.length - 1]
 		const diff = Math.abs(start - end)
 		const sign = start < end ? "+" : "-"
-
 		const originalCost = buffer.join(",").length
 		const compressedString = `${start}${sign}${diff}`
 		const compressedCost = compressedString.length + 2
-
 		if (compressedCost < originalCost) {
 			output.push(compressedString as T)
-		} else {
+		}
+		else {
 			output.push(...buffer as T[])
 		}
 
@@ -129,9 +125,8 @@ export function compressArraySequences<T>(input: T[]): T[] {
 
 	for (let i = 0; i < input.length; i++) {
 		const curr = input[i]
-
 		if (typeof curr !== 'number') {
-			flushBuffer()
+			fn_flushBuffer()
 			output.push(curr)
 			continue
 		}
@@ -143,15 +138,14 @@ export function compressArraySequences<T>(input: T[]): T[] {
 
 		const prev = buffer[buffer.length - 1]
 		const mathDiff = curr - prev
-
 		if (Math.abs(mathDiff) !== 1) {
-			flushBuffer()
+			fn_flushBuffer()
 			buffer.push(curr)
 			continue
 		}
 
 		if (direction !== 0 && mathDiff !== direction) {
-			flushBuffer()
+			fn_flushBuffer()
 			buffer.push(curr)
 			continue
 		}
@@ -160,7 +154,7 @@ export function compressArraySequences<T>(input: T[]): T[] {
 		direction = mathDiff
 	}
 
-	flushBuffer()
+	fn_flushBuffer()
 	return output
 }
 
@@ -180,7 +174,6 @@ export function compressArraySequences<T>(input: T[]): T[] {
 export function decompressArraySequences<T>(input: T[]): T[] {
 	const output: T[] = []
 	const pattern = /^(-?\d+)([+-])(\d+)$/
-
 	for (const item of input) {
 		if (typeof item !== 'string') {
 			output.push(item)
@@ -188,7 +181,6 @@ export function decompressArraySequences<T>(input: T[]): T[] {
 		}
 
 		const match = item.match(pattern)
-
 		if (!match) {
 			output.push(item)
 			continue
@@ -197,11 +189,8 @@ export function decompressArraySequences<T>(input: T[]): T[] {
 		const start = parseInt(match[1], 10)
 		const sign = match[2]
 		const diff = parseInt(match[3], 10)
-
-		if (sign === '+') {
-			for (let i = 0; i <= diff; i++) output.push(start + i as T)
-		} else {
-			for (let i = 0; i <= diff; i++) output.push(start - i as T)
+		for (let i = 0; i <= diff; i++) {
+			output.push(start + (sign === '+'? i : -i) as T)
 		}
 	}
 
