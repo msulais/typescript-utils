@@ -1,13 +1,10 @@
 /**
- * Compresses any image Blob/File to a JPEG Blob at specific quality.
- * * @param inputBlob - The original image file (Blob or File).
- * @param quality - Number between 0 and 1 (default 0.8).
- * @param maxWidth - (Optional) Max width to resize down to. 
+ * @param maxWidth - (Optional) Max width to resize down to.
  */
-export async function compressToJpeg(JPEGFile: Blob, quality: number = 0.8, maxWidth?: number): Promise<Blob> {
-	const SIZE_THRESHOLD = 300 * 1024
-	if (JPEGFile.size < SIZE_THRESHOLD) {
-		return JPEGFile
+export async function compressToJpeg(image: Blob, quality: number = 0.8, maxWidth?: number): Promise<Blob> {
+	const SIZE_THRESHOLD = 250 * 1024
+	if (image.size < SIZE_THRESHOLD) {
+		return image
 	}
 
 	return new Promise((resolve, reject) => {
@@ -50,14 +47,55 @@ export async function compressToJpeg(JPEGFile: Blob, quality: number = 0.8, maxW
 			img.onerror = (err) => reject(err)
 			if (event.target?.result) {
 				img.src = event.target.result as string
-			} 
+			}
 			else {
 				reject(new Error('FileReader failed to load result'))
 			}
 		}
 
 		reader.onerror = (err) => reject(err)
-		reader.readAsDataURL(JPEGFile)
+		reader.readAsDataURL(image)
+	})
+}
+
+export function isPNGHasTransparency(pngBlob: Blob): Promise<boolean> {
+	return new Promise((resolve, reject) => {
+		const url = URL.createObjectURL(pngBlob)
+		const img = new Image()
+		img.onload = () => {
+			URL.revokeObjectURL(url)
+
+			const canvas = document.createElement('canvas')
+			canvas.width = img.width
+			canvas.height = img.height
+
+			const ctx = canvas.getContext('2d')
+			if (!ctx) {
+				reject(new Error('Could not get Canvas context'))
+				return
+			}
+
+			ctx.drawImage(img, 0, 0)
+
+			// Get all pixel data
+			const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+
+			// Check Alpha channel (every 4th value) for values < 255
+			for (let i = 3; i < data.length; i += 4) {
+				if (data[i] < 255) {
+					resolve(true)
+					return
+				}
+			}
+
+			resolve(false)
+		}
+
+		img.onerror = (error) => {
+			URL.revokeObjectURL(url)
+			reject(error)
+		}
+		img.src = url
 	})
 }
 
