@@ -192,6 +192,31 @@ export class IDB {
 		request.onupgradeneeded = (ev) => listeners?.onUpgrade?.(ev, this)
 	}
 
+	/**
+	 * Clear all object store values
+	 */
+	async clearDatabase(): Promise<any> {
+		return new Promise(ok => {
+			const stores = this.#db?.objectStoreNames
+			if (!stores) {
+				return ok(1)
+			}
+
+			const transaction = this.transaction([...stores], 'readwrite')
+			if (!transaction) {
+				return ok(1)
+			}
+
+			for (const store of stores) {
+				transaction.objectStore(store).clear()
+			}
+
+			transaction.onabort = ok
+			transaction.oncomplete = ok
+			transaction.onerror = ok
+		})
+	}
+
 	transaction(
 		store: string | string[],
 		mode?: IDBTransactionMode,
