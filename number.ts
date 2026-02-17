@@ -89,7 +89,7 @@ export function binaryToFloat(input: string, bit: 32 | 64 = 64): number {
 		const intVal = parseInt(paddedInput, 2)
 		view.setUint32(0, intVal)
 		return view.getFloat32(0)
-	} 
+	}
 
 	const bigIntVal = BigInt("0b" + paddedInput)
 	view.setBigUint64(0, bigIntVal)
@@ -97,6 +97,10 @@ export function binaryToFloat(input: string, bit: 32 | 64 = 64): number {
 }
 
 export function numberToBinary(input: number, bit: 32 | 64 = 64): string {
+	if (input % 1 === 0) {
+		return input.toString(2)
+	}
+
     const buffer = new ArrayBuffer(8)
     const view = new DataView(buffer)
 	if (bit !== 32 && bit !== 64) {
@@ -111,7 +115,7 @@ export function numberToBinary(input: number, bit: 32 | 64 = 64): string {
 	else {
 		view.setFloat64(0, input)
 		binary = view.getBigUint64(0).toString(2)
-	} 
+	}
 
 	return binary.padStart(bit, '0')
 }
