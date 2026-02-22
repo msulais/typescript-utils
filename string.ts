@@ -1,3 +1,5 @@
+type StringIndex = number
+
 export function stringToTitleCase(text: string): string {
 	return text
 		.split(' ')
@@ -124,4 +126,32 @@ export const smartTruncate = (
 	const leftStr = left.join(' ')
 	const rightStr = right.join(' ')
 	return leftStr + separator + rightStr
+}
+
+export class SharedString {
+	private _sharedString = new Map<string, StringIndex>()
+	constructor(...values: string[]) {
+		for (const value of values) {
+			this.getIndex(value)
+		}
+	}
+
+	toArray(): string[] {
+		const values: string[] = []
+		for (const [str, i] of this._sharedString) {
+			values[i] = str
+		}
+
+		return values
+	}
+
+	getIndex(value: string): StringIndex {
+		if (this._sharedString.has(value)) {
+			return this._sharedString.get(value)!
+		}
+
+		const index = this._sharedString.size
+		this._sharedString.set(value, index)
+		return index
+	}
 }
