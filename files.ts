@@ -1,4 +1,23 @@
 /**
+ * Converts a size in bytes to a human-readable string.
+ * * @param bytes - The file size in bytes.
+ * @param decimals - The number of decimal places to include (defaults to 2).
+ * @returns A formatted string representing the file size.
+ */
+export function formatFileSize(bytes: number, decimals: number = 2): string {
+	if (bytes === 0) {
+		return '0 Byte'
+	}
+
+	const k = 1024
+	const dm = decimals < 0 ? 0 : decimals
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+	const i = Math.floor(Math.log(bytes) / Math.log(k))
+	const value = parseFloat((bytes / Math.pow(k, i)).toFixed(dm))
+	return `${value} ${sizes[i]}`
+}
+
+/**
  * @param maxWidth - (Optional) Max width to resize down to.
  */
 export async function compressToJpeg(image: Blob, quality: number = 0.8, maxWidth?: number): Promise<Blob> {
